@@ -2,22 +2,14 @@ const express = require('express');
 const app = express();
 const port = 3000;
 
-// Import koneksi dan semua model
 const db = require('./models');
 
-// Middleware untuk membaca JSON
 app.use(express.json());
 
-// ===============================================
-// ===     RUTE-RUTE UNTUK OPERASI CRUD        ===
-// ===============================================
-
-// 1. CREATE (POST)
 app.post('/hotel', async (req, res) => {
     try {
         const { tipe_kamar, kapasitas_tamu, lantai, fasilitas, tanggal_pesan } = req.body;
         
-        // Cek data penting
         if (!tipe_kamar || !kapasitas_tamu) {
             return res.status(400).json({ message: 'Tipe kamar dan kapasitas tamu wajib diisi' });
         }
@@ -42,7 +34,6 @@ app.post('/hotel', async (req, res) => {
     }
 });
 
-// 2. READ (GET All)
 app.get('/hotel', async (req, res) => {
     try {
         const semuaHotel = await db.Hotel.findAll();
@@ -57,7 +48,6 @@ app.get('/hotel', async (req, res) => {
     }
 });
 
-// 3. READ (GET by ID)
 app.get('/hotel/:id', async (req, res) => {
     try {
         const id = req.params.id;
@@ -79,7 +69,6 @@ app.get('/hotel/:id', async (req, res) => {
     }
 });
 
-// 4. UPDATE (PUT)
 app.put('/hotel/:id', async (req, res) => {
     try {
         const id = req.params.id;
@@ -89,10 +78,8 @@ app.put('/hotel/:id', async (req, res) => {
             return res.status(404).json({ success: false, message: 'Hotel tidak ditemukan' });
         }
 
-        // Ambil data dari body
         const { tipe_kamar, kapasitas_tamu, lantai, fasilitas, tanggal_pesan } = req.body;
 
-        // Lakukan update
         await hotel.update({
             tipe_kamar: tipe_kamar,
             kapasitas_tamu: kapasitas_tamu,
@@ -104,7 +91,7 @@ app.put('/hotel/:id', async (req, res) => {
         res.status(200).json({
             success: true,
             message: 'Data hotel berhasil diupdate',
-            data: hotel // Kirim data yang sudah diupdate
+            data: hotel 
         });
 
     } catch (error) {
@@ -113,7 +100,6 @@ app.put('/hotel/:id', async (req, res) => {
     }
 });
 
-// 5. DELETE
 app.delete('/hotel/:id', async (req, res) => {
     try {
         const id = req.params.id;
@@ -123,7 +109,6 @@ app.delete('/hotel/:id', async (req, res) => {
             return res.status(404).json({ success: false, message: 'Hotel tidak ditemukan' });
         }
 
-        // Hapus data
         await hotel.destroy();
 
         res.status(200).json({
@@ -138,13 +123,9 @@ app.delete('/hotel/:id', async (req, res) => {
 });
 
 
-// ===============================================
-// ===           JALANKAN SERVER               ===
-// ===============================================
 app.listen(port, async () => {
     console.log(`Server berjalan di http://localhost:${port}`);
     try {
-        // Tes koneksi ke database (TIDAK PAKAI SYNC)
         await db.sequelize.authenticate();
         console.log('Koneksi ke database MySQL (Tentrem) BERHASIL.');
     } catch (error) {
